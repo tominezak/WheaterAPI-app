@@ -30,3 +30,9 @@ grades = {"Sandy": "A", "Patrick": "B", "SpongeBob": "C"}
 student = input("Enter a student name to check their grade: ")
 if student in grades:
     print(f"{student} has a grade of {grades[student]}.")
+
+email = "brocode@email.com"
+if '@' in email and '.' in email:
+    print(f"{email} is a valid email address.")
+else:
+    print(f"{email} is not a valid email address.")

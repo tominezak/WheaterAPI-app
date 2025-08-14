@@ -9,3 +9,8 @@ print(result)
 y = -3
 result2 = abs(y)
 print(result2)
+
+#pow(4, 3) er 4 i andre
+#max(3, 2, 1)
+#min(3, 2 ,1)
+#round(x, 3) med spesifikt antall desimaler

@@ -19,4 +19,5 @@ for food in foods:
 for price in prices:
     total += price
 
+print()
 print(f'your total is: {total}')

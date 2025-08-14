@@ -22,10 +22,12 @@ print(fruits_upper)
 fruit_chars = [fruit[0] for fruit in fruits]  # første bokstav i hvert element
 print(fruit_chars)
 
-numbers = [1, -2, 3, -4, 5, -6]
+numbers = [1, -2, 3, -4, 5, -6, 8, -7]
 positive_numbers = [num for num in numbers if num > 0]  # filtrerer ut negative tall
 negative_numbers = [num for num in numbers if num < 0]  # det som returneres settes først
 even_numbers = [num for num in numbers if num % 2 == 0]  # filtrere ut partall
+odd_numbers = [num for num in numbers if num % 2 != 0]  # filtrere ut oddetall
 print(positive_numbers)
 print(negative_numbers)
 print(even_numbers)
+print(odd_numbers)

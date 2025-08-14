@@ -19,4 +19,14 @@ def day_of_week(day):
             return "Søndag"
         case _:
             return "Ugyldig dag"  # Fanger alle andre tilfeller
-    
+
+print(day_of_week(1))  # Mandag
+
+def is_weekend(day):
+    match day:
+        case "Sunday" | "Saturday":  # Bruker | for å matche flere verdier
+            return True
+        case _:
+            return False
+
+print(is_weekend("Monday"))  # False

@@ -1,3 +1,4 @@
+# Madlibs game
 adjective = input('Skriv inn et adjektiv: ')
 noun1 = input('Enter a noun')
 adjective2 = input('Skriv inn et adjektiv: ')
