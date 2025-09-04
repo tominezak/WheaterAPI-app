@@ -1,7 +1,7 @@
 import sys
 import requests 
-from PyQt5.QtWidgets import QApplication, QWidget, QLabel, QLineEdit, QPushButton, QVBoxLayout
-from PyQt5.QtCore import Qt
+from PyQt5.QtWidgets import QApplication, QWidget, QLabel, QLineEdit, QPushButton, QVBoxLayout, QComboBox
+from PyQt5.QtCore import Qt, QDateTime
 
 class WeatherApp(QWidget):
     def __init__(self):
@@ -12,19 +12,26 @@ class WeatherApp(QWidget):
         self.temperature_label = QLabel(self)
         self.emoji_label = QLabel(self)
         self.description_label = QLabel(self)
+        self.updated_label = QLabel("", self)
+        self.unit_combo = QComboBox(self)
+        self.unit_combo.addItems(["°C", "°F"])
         self.initUI()
 
     def initUI(self):
         self.setWindowTitle('Weather App')
+        self.setFixedSize(500, 600)  # velg størrelse du vil ha
+        self.temperature_label.setWordWrap(True)
 
         vbox = QVBoxLayout()
 
         vbox.addWidget(self.city_label)
         vbox.addWidget(self.city_input)
+        vbox.addWidget(self.unit_combo)
         vbox.addWidget(self.get_weather_button)
         vbox.addWidget(self.temperature_label)
         vbox.addWidget(self.emoji_label)
         vbox.addWidget(self.description_label)
+        vbox.addWidget(self.updated_label)
 
         self.setLayout(vbox)
 
@@ -33,29 +40,63 @@ class WeatherApp(QWidget):
         self.temperature_label.setAlignment(Qt.AlignCenter)
         self.emoji_label.setAlignment(Qt.AlignCenter)
         self.description_label.setAlignment(Qt.AlignCenter)
+        self.updated_label.setAlignment(Qt.AlignCenter)
 
         self.city_label.setObjectName("cityLabel")
         self.city_input.setObjectName("cityInput")
+        self.unit_combo.setObjectName("unitCombo")
         self.get_weather_button.setObjectName("getWeatherButton")
         self.temperature_label.setObjectName("temperatureLabel")
         self.emoji_label.setObjectName("emojiLabel")
         self.description_label.setObjectName("descriptionLabel")
+        self.updated_label.setObjectName("updatedLabel")
 
         self.setStyleSheet("""
+            QWidget{
+                background-color: #CCF6FF;
+            }
             QLabel{
                 font-family: Calibri;
+                font-weight: bold;
             }
             QLabel#cityLabel{
                 font-size: 40px;
                 font-style: italic;
             }
+                           
             QLineEdit#cityInput{
                 font-size: 40px;
                 min-height: 60px;
+                border: 2px solid black;
+                border-radius: 10px;
+                padding: 10px;
+                background-color: #EBFCFF;
             }
+                           
+            QComboBox#unitCombo{
+                font-size: 18px;
+                height: 30px;
+                border: 2px solid black;
+                padding: 5px;
+                background-color: #EBFCFF;
+                color: black;
+            }
+            
+            QComboBox#unitCombo QAbstractItemView {
+                color: black; /* Sørger for at ALL tekst i nedtrekkslisten er svart */
+                background-color: #CCF6FF;
+            }
+            
+            QComboBox#unitCombo QAbstractItemView::item:hover {
+                background-color: #EBFCFF; /* Hover-farge */
+            }
+                           
             QPushButton#getWeatherButton{
+                background-color: #EBFCFF;
                 font-size: 30px;
                 font-weight: bold;
+                padding: 10px;
+                border: 2px solid black;
             }
             QLabel#temperatureLabel{
                 font-size: 75px;
@@ -66,7 +107,13 @@ class WeatherApp(QWidget):
                 font-family: "Apple Color Emoji";
             }
             QLabel#descriptionLabel{
-                font-size: 50px;
+                font-size: 30px;
+            }
+            QLabel#updatedLabel{
+                font-size: 12px;
+                font-style: italic;
+                color: #555555;
+            }
         """)
 
         self.get_weather_button.clicked.connect(self.get_weather)
@@ -76,7 +123,9 @@ class WeatherApp(QWidget):
     def get_weather(self):
         api_key = "5154da1038d8933d48a3f337bacce707"
         city = self.city_input.text()
-        url = f"https://api.openweathermap.org/data/2.5/weather?q={city}&appid={api_key}"
+        unit = "metric" if self.unit_combo.currentText() == "°C" else "imperial"
+
+        url = (f"https://api.openweathermap.org/data/2.5/weather"f"?q={city}&appid={api_key}&units={unit}")
 
         try:
             response = requests.get(url)
@@ -84,7 +133,7 @@ class WeatherApp(QWidget):
             data = response.json()
 
             if data["cod"] == 200:
-                self.display_weather(data)
+                self.display_weather(data, unit)
 
         except requests.exceptions.HTTPError:
             match response.status_code:
@@ -116,48 +165,51 @@ class WeatherApp(QWidget):
             self.display_error(f"Request error:\n{req_error}")
 
     def display_error(self, message):
-        self.temperature_label.setStyleSheet("color: red; font-size: 20px;")
+        self.temperature_label.setStyleSheet("color: red; font-size: 18px;")
+        self.temperature_label.setWordWrap(True)
         self.temperature_label.setText(message)
         self.emoji_label.clear()
         self.description_label.clear()
+        self.updated_label.clear()
  
-    def display_weather(self, data):
+    def display_weather(self, data, unit):
         self.temperature_label.setStyleSheet("font-size: 75px;")
-        temperature_k = data["main"]["temp"]
-        temperature_c = temperature_k - 273.15
-        temperature_f = (temperature_k * 9/5) - 459.67 
+        temp = data["main"]["temp"]
+        symbol = "°C" if unit == "metric" else "°F"
         weather_id = data["weather"][0]["id"]
         weather_description = data["weather"][0]["description"]
 
-        self.temperature_label.setText(f"{temperature_f:.2f}°F")
+        self.temperature_label.setText(f"{temp:.1f}{symbol}")
+        self.description_label.setText(data["weather"][0]["description"].capitalize())
         self.emoji_label.setText(self.get_weather_emoji(weather_id))
         self.description_label.setText(weather_description.capitalize())
+        self.updated_label.setText("Last updated: " + QDateTime.currentDateTime().toString("dd.MM.yyyy HH:mm"))
 
     @staticmethod
     def get_weather_emoji(weather_id):
          match weather_id:
             case _ if 200 <= weather_id <= 232:
-                return "⛈️"   # Thunderstorm
+                return "⛈️"   
             case _ if 300 <= weather_id <= 321:
-                return "🌦️"   # Drizzle
+                return "🌦️"   
             case _ if 500 <= weather_id <= 531:
-                return "🌧️"   # Rain
+                return "🌧️"  
             case _ if 600 <= weather_id <= 622:
-                return "❄️"   # Snow
+                return "❄️"   
             case _ if 701 <= weather_id <= 741:
-                return "🌫️"   # Mist, fog, haze
+                return "🌫️"   
             case 762:
-                return "🌋"   # Volcano
+                return "🌋"   
             case 771:
-                return "💨"   # Strong wind
+                return "💨"   
             case 781:
-                return "🌪️"   # Tornado
+                return "🌪️"   
             case 800:
-                return "☀️"   # Clear sky
+                return "☀️"   
             case _ if 801 <= weather_id <= 804:
-                return "☁️"   # Clouds
+                return "☁️"   
             case _:
-                return ""     # Unknown
+                return ""   
 
 
 if __name__ == "__main__":
