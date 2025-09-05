@@ -54,7 +54,6 @@ class WeatherApp(QWidget):
         self.setStyleSheet("""
             QWidget{
                 background-color: #CCF6FF;
-                color: black; /* Setter all tekst til svart  TEST*/
             }
             QLabel{
                 font-family: Calibri;
