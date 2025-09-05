@@ -3,7 +3,7 @@ import requests
 from PyQt5.QtWidgets import QApplication, QWidget, QLabel, QLineEdit, QPushButton, QVBoxLayout, QComboBox
 from PyQt5.QtCore import Qt, QDateTime
 
-class WeatherApp(QWidget):
+class WeatherApp(QWidget): 
     def __init__(self):
         super().__init__()
         self.city_label = QLabel("Enter city name:", self)
@@ -54,6 +54,7 @@ class WeatherApp(QWidget):
         self.setStyleSheet("""
             QWidget{
                 background-color: #CCF6FF;
+                color: black; /* Setter all tekst til svart  TEST*/
             }
             QLabel{
                 font-family: Calibri;
